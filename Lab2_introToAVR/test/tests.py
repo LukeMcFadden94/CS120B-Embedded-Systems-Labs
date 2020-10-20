@@ -18,13 +18,9 @@ tests = [
 
     # Test weight values
 
-    {'description': 'PINA[1:0]: 28, PINB[1:0]: 28, PINC[1:0]: 28',
-    'steps': [ {'inputs': [('PINA',0x28), ('PINB',0x28), ('PINC',0x28)], 'iterations': 2 } ],
-    'expected': [('PORTD',0x78)]
-    },
-    {'description': 'PINA[1:0]: 00, PINB[1:0]: 32, PINC[1:0]: 00',
-    'steps': [ {'inputs': [('PINA',0x00), ('PINB',0x32), ('PINC',0x00)], 'iterations': 2 } ],
-    'expected': [('PORTD',0x30)]
+    {'description': 'PINA[1:0]: 14, PINB[1:0]: 14, PINC[1:0]: 14',
+    'steps': [ {'inputs': [('PINA',0x14), ('PINB',0x14), ('PINC',0x14)], 'iterations': 2 } ],
+    'expected': [('PORTD',0x3C)]
     },
     {'description': 'PINA[1:0]: 2D, PINB[1:0]: 2D, PINC[1:0]: 2D',
     'steps': [ {'inputs': [('PINA',0x2D), ('PINB',0x2D), ('PINC',0x2D)], 'iterations': 2 } ],
@@ -32,24 +28,24 @@ tests = [
     },
     {'description': 'PINA[1:0]: 32, PINB[1:0]: 32, PINC[1:0]: 32',
     'steps': [ {'inputs': [('PINA',0x32), ('PINB',0x32), ('PINC',0x32)], 'iterations': 2 } ],
-    'expected': [('PORTD',0x95)]
+    'expected': [('PORTD',0x09)]
     },
-    {'description': 'PINA[1:0]: 3C, PINB[1:0]: 3C, PINC[1:0]: 3C',
-    'steps': [ {'inputs': [('PINA',0x3C), ('PINB',0x3C), ('PINC',0x3C)], 'iterations': 2 } ],
-    'expected': [('PORTD',0xB5)]
+    {'description': 'PINA[1:0]: 46, PINB[1:0]: 46, PINC[1:0]: 46',
+    'steps': [ {'inputs': [('PINA',0x46), ('PINB',0x46), ('PINC',0x46)], 'iterations': 2 } ],
+    'expected': [('PORTD',0x45)]
     },
-    {'description': 'PINA[1:0]: 14, PINB[1:0]: 0A, PINC[1:0]: 64',
-    'steps': [ {'inputs': [('PINA',0x14), ('PINB',0x0A), ('PINC',0x64)], 'iterations': 2 } ],
-    'expected': [('PORTD',0x80)]
+    {'description': 'PINA[1:0]: 0A, PINB[1:0]: 14, PINC[1:0]: 5F',
+    'steps': [ {'inputs': [('PINA',0x0A), ('PINB',0x14), ('PINC',0x5F)], 'iterations': 2 } ],
+    'expected': [('PORTD',0x7E)]
     },
-    {'description': 'PINA[1:0]: 6E, PINB[1:0]: 1E, PINC[1:0]: 00',
-    'steps': [ {'inputs': [('PINA',0x6E), ('PINB',0x1E), ('PINC',0x00)], 'iterations': 2 } ],
+    {'description': 'PINA[1:0]: 00, PINB[1:0]: 28, PINC[1:0]: 64',
+    'steps': [ {'inputs': [('PINA',0x00), ('PINB',0x28), ('PINC',0x64)], 'iterations': 2 } ],
     'expected': [('PORTD',0x8E)]
     },
-    {'description': 'PINA[1:0]: 19, PINB[1:0]: 2D, PINC[1:0]: 6E',
-    'steps': [ {'inputs': [('PINA',0x19), ('PINB',0x2D), ('PINC',0x6E)], 'iterations': 2 } ],
-    'expected': [('PORTD',0xB7)]
-    },
+    {'description': 'PINA[1:0]: 78, PINB[1:0]: 1E, PINC[1:0]: 14',
+    'steps': [ {'inputs': [('PINA',0x78), ('PINB',0x1E), ('PINC',0x14)], 'iterations': 2 } ],
+    'expected': [('PORTD',0x1F)]
+    },0
 
 
 ]
@@ -57,4 +53,4 @@ tests = [
 # Optionally you can add a set of "watch" variables these need to be global or static and may need
 # to be scoped at the function level (for static variables) if there are naming conflicts. The 
 # variables listed here will display everytime you hit (and stop at) a breakpoint
-watch = ['main::tempA, tempB, tempC','PORTD']
+watch = ['main::tempA', 'main::tempB', 'main::tempC', 'main::totalWeight', 'main::weightDiff', 'main::tempD', 'PORTD']

@@ -20,8 +20,8 @@ int main(void) {
 	unsigned char tempB = 0x00; // Temporary variable to hold the value of B
 	unsigned char tempC = 0x00; // Temporary variable to hold the value of C
 	unsigned char tempD = 0x00; // Temporary variable to hold the value of D
-	unsigned char weightOG = 0x00; // Temporary variable to hold total weight
-	unsigned char weight2 = 0x00; // Temporary variable to hold total weight2
+	unsigned char totalWeight = 0x00; // Temporary variable to hold total total weight
+	unsigned char weightDiff = 0x00; // Temporary variable to hold weight difference
 	
 	while(1) 
 	{
@@ -30,18 +30,18 @@ int main(void) {
 		tempB = PINB;
 		tempC = PINC;	
 
-		// Assign weight variable the weight combination of all 3 sensors
-		weightOG = tempA + tempB + tempC;
+		// Assign totalWeight variable the weight combination of all 3 sensors
+		totalWeight = tempA + tempB + tempC;
 	
-		// Mask off first 2 bits of weight variable
-		weight2 = weightOG & 0xFC; 
+		// Assign tempD the total weight, mask off first 2 binary digits
+		tempD = totalWeight & 0xFC;
 
-		// Assign tempD7-2 the bits of tempA7-2
-		tempD = weight2;
-
-		//If weight exceeds 140kg, set tempD's first bit to 1
-		if (weightOG > 140)
+		// If total weight > 140, assign weightDiff the difference between total weight and the max weight capacity
+		if (totalWeight > 140)
 		{
+			weightDiff = totalWeight - 140;
+			// Assign tempD7-2 the weightDiff7-2 bits, and make tempD0 1 because weight capacity was exceeded
+			tempD = weightDiff & 0xFC;
 			tempD = tempD | 0x01;
 		}
 
