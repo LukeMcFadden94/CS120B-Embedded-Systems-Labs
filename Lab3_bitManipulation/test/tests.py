@@ -18,38 +18,58 @@ tests = [
 
     # Test counting amount of 1's in PINA and PINB
 
-    {'description': 'PINA[1:0]: 00, PINB[1:0]: 00',
-    'steps': [ {'inputs': [('PINA',0x00), ('PINB',0x00)], 'iterations': 2 } ],
-    'expected': [('PORTC',0x00)]
+    {'description': 'PIND[1:0]: 00, PINB[1:0]: 00',
+    'steps': [ {'inputs': [('PIND',0x00), ('PINB',0x00)], 'iterations': 2 } ],
+    'expected': [('PORTB',0x00)]
     },
-    {'description': 'PINA[1:0]: FF, PINB[1:0]: FF',
-    'steps': [ {'inputs': [('PINA',0xFF), ('PINB',0xFF)], 'iterations': 2 } ],
-    'expected': [('PORTC',0x10)]
+    {'description': 'PIND[1:0]: 00, PINB[1:0]: 01',
+    'steps': [ {'inputs': [('PIND',0x00), ('PINB',0x01)], 'iterations': 2 } ],
+    'expected': [('PORTB',0x00)]
     },
-    {'description': 'PINA[1:0]: F0, PINB[1:0]: 0F',
-    'steps': [ {'inputs': [('PINA',0xF0), ('PINB',0x0F)], 'iterations': 2 } ],
-    'expected': [('PORTC',0x08)]
+    {'description': 'PIND[1:0]: 00, PINB[1:0]: 05',
+    'steps': [ {'inputs': [('PIND',0x00), ('PINB',0x05)], 'iterations': 2 } ],
+    'expected': [('PORTB',0x00)]
     },
-    {'description': 'PINA[1:0]: 12, PINB[1:0]: 34',
-    'steps': [ {'inputs': [('PINA',0x12), ('PINB',0x34)], 'iterations': 2 } ],
-    'expected': [('PORTC',0x05)]
+    {'description': 'PIND[1:0]: 01, PINB[1:0]: 01',
+    'steps': [ {'inputs': [('PIND',0x01), ('PINB',0x01)], 'iterations': 2 } ],
+    'expected': [('PORTB',0x00)]
     },
-    {'description': 'PINA[1:0]: 56, PINB[1:0]: 78',
-    'steps': [ {'inputs': [('PINA',0x56), ('PINB',0x78)], 'iterations': 2 } ],
-    'expected': [('PORTC',0x08)]
+    {'description': 'PIND[1:0]: 09, PINB[1:0]: 00',
+    'steps': [ {'inputs': [('PIND',0x09), ('PINB',0x00)], 'iterations': 2 } ],
+    'expected': [('PORTB',0x04)]
     },
-    {'description': 'PINA[1:0]: 9A, PINB[1:0]: BC',
-    'steps': [ {'inputs': [('PINA',0x9A), ('PINB',0xBC)], 'iterations': 2 } ],
-    'expected': [('PORTC',0x09)]
+    {'description': 'PIND[1:0]: 19, PINB[1:0]: 01',
+    'steps': [ {'inputs': [('PIND',0x19), ('PINB',0x01)], 'iterations': 2 } ],
+    'expected': [('PORTB',0x04)]
     },
-    {'description': 'PINA[1:0]: A1, PINB[1:0]: C4',
-    'steps': [ {'inputs': [('PINA',0xA1), ('PINB',0xC4)], 'iterations': 2 } ],
-    'expected': [('PORTC',0x06)]
+    {'description': 'PIND[1:0]: 22, PINB[1:0]: 01',
+    'steps': [ {'inputs': [('PIND',0x22), ('PINB',0x01)], 'iterations': 2 } ],
+    'expected': [('PORTB',0x04)]
     },
-
+    {'description': 'PIND[1:0]: 4B, PINB[1:0]: 00',
+    'steps': [ {'inputs': [('PIND',0x4B), ('PINB',0x00)], 'iterations': 2 } ],
+    'expected': [('PORTB',0x02)]
+    },
+    {'description': 'PIND[1:0]: 7D, PINB[1:0]: 00',
+    'steps': [ {'inputs': [('PIND',0x7D), ('PINB',0x00)], 'iterations': 2 } ],
+    'expected': [('PORTB',0x02)]
+    },
+    {'description': 'PIND[1:0]: 80, PINB[1:0]: 00',
+    'steps': [ {'inputs': [('PIND',0x80), ('PINB',0x00)], 'iterations': 2 } ],
+    'expected': [('PORTB',0x02)]
+    },
+    {'description': 'PIND[1:0]: 96, PINB[1:0]: 01',
+    'steps': [ {'inputs': [('PIND',0x96), ('PINB',0x01)], 'iterations': 2 } ],
+    'expected': [('PORTB',0x02)]
+    },
+    {'description': 'PIND[1:0]: FF, PINB[1:0]: 01',
+    'steps': [ {'inputs': [('PIND',0xFF), ('PINB',0x01)], 'iterations': 2 } ],
+    'expected': [('PORTB',0x02)]
+    },
+    
     ]
 
 # Optionally you can add a set of "watch" variables these need to be global or static and may need
 # to be scoped at the function level (for static variables) if there are naming conflicts. The 
 # variables listed here will display everytime you hit (and stop at) a breakpoint
-watch = ['main::tempA, tempB','PORTC']
+watch = ['main::tempD', 'main::tempB','PORTB', 'PINB', 'weight']
