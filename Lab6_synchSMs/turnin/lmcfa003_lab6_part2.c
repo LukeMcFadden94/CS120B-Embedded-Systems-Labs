@@ -1,6 +1,6 @@
-/*	Author: lab
+/*	Author: Luke McFadden
  *  Partner(s) Name: 
- *	Lab Section:
+ *	Lab Section: 023
  *	Assignment: Lab 6  Exercise 2
  *	Exercise Description:
  *
