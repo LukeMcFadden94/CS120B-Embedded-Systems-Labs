@@ -1,21 +1,19 @@
-/*	Author: Luke McFadden
+/*  Author: Luke McFadden
  *  Partner(s) Name: 
- *	Lab Section: 023
- *	Assignment: Lab 8  Exercise 1
- *	Exercise Description: 
+ *  Lab Section: 023
+ *  Assignment: Lab 8  Exercise 1
+ *  Exercise Description: 
  *
- *	I acknowledge all content contained herein, excluding template or example
- *	code, is my own original work.
+ *  I acknowledge all content contained herein, excluding template or example
+ *  code, is my own original work.
  *
-  * Demo Link: 
+  * Demo Link: https://youtu.be/-2y9ThT7ei4
  */
 #include <avr/io.h>
 #ifdef _SIMULATE_
 #include "simAVRHeader.h"
-#include "timer.h"
 #endif
 
-#define input (~PINA & 0x07)
 
 void set_PWM(double frequency)
 {
@@ -55,8 +53,16 @@ void PWM_off()
 
 enum States {start, wait, soundC, soundD, soundE} state;
 
+unsigned char fC = 0;
+unsigned char fD = 0;
+unsigned char fE = 0;
+
 void Tick()
 {
+    fC = (~PINA) & 0x01;
+    fD = (~PINA) & 0x02;
+    fE = (~PINA) & 0x04;
+
     switch (state)  // Transitions begin
     {
         case start:
@@ -64,46 +70,41 @@ void Tick()
             break;
 
         case wait:
-            switch(input)
-            {
-                case 1:
-                    state = soundC;
-                    break;
+            if (fC && !fD && !fE)
+                state = soundC;
+            else if(!fC && fD && !fE)
+                state = soundD;
+            else if(!fC && !fD && fE)
+                state = soundE;
+            else
+                state = wait;
 
-                case 2:
-                    state = soundD;
-                    break;
-
-                case 4:
-                    state = soundE;
-                    break;
-
-                default:
-                    state = start;
-                    break;
-            }
             break;
 
         case soundC:
-            if (input == 1)
+            if (fC && !fD && !fE)
                 state = soundC;
             else
                 state = wait;
             break;
 
         case soundD:
-            if (input == 2)
+            if (!fC && fD && !fE)
                 state = soundD;
             else
                 state = wait;
             break;
 
         case soundE:
-            if (input == 4)
+            if (!fC && !fD && fE)
                 state = soundE;
             else
                 state = wait;
-            break;      
+            break;    
+
+        default:
+            state = start;
+            break;  
     }               // Transitions end
 
     switch (state)  // State actions begin
@@ -134,17 +135,12 @@ int main(void)
     DDRA = 0x00; PORTA = 0xFF;  // PORT A is input
     DDRB = 0xFF; PORTB = 0x00;  // PORT B is output
 
-    TimerSet(1000);
-    TimerOn();
     PWM_on();
     state = start;
 
     while (1) 
     {
         Tick();
-
-        while (!TimerFlag);
-        TimerFlag = 0;
     }
 
     return 1;
