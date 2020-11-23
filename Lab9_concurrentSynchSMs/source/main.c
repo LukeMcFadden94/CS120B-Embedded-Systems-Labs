@@ -1,13 +1,13 @@
 /*	Author: Luke McFadden
  *  Partner(s) Name: 
  *	Lab Section: 023
- *	Assignment: Lab 9  Exercise 2
+ *	Assignment: Lab 9  Exercise 3
  *	Exercise Description: 
  *
  *	I acknowledge all content contained herein, excluding template or example
  *	code, is my own original work.
  *
- * Demo Link: https://youtu.be/CBXnBxiGiiA
+ * Demo Link: 
  */
 #include <avr/io.h>
 #ifdef _SIMULATE_
@@ -15,13 +15,17 @@
 #include "timer.h"
 #endif
 
+#define A2 (~PINA & 0x04)
+
 enum ThreeLEDsSM {Start1, led1, led2, led3} SMone;
 enum BlinkingLEDSM {Start2, on, off} SMtwo;
 enum CombineLEDsSM {Start3, display} SMthree;
+enum SpeakerSM {Start4, soundOff, soundOn} SMfour;
 unsigned char threeLEDs = 0;
 unsigned char blinkingLED = 0;
 unsigned short threeLEDCounter = 0;
 unsigned short blinkLEDCounter = 0;
+unsigned short speakerVar = 0;
 unsigned char output = 0x00;
 
 void Tick1()
@@ -105,6 +109,48 @@ void Tick2()
     }               // State actions end
 }
 
+void Tick4()
+{
+    switch (SMfour)     // Transitions begin
+    {
+        case Start4:
+            SMfour = soundOff;
+            break;
+
+        case soundOff:
+            if (A2)
+                SMfour = soundOn;
+            else
+                SMfour = soundOff;
+            break;
+
+        case soundOn:
+            if (A2)
+                SMfour = soundOn;
+            else
+                SMfour = soundOff;
+            break;
+
+        default:
+            SMfour = Start4;
+            break;
+    }                   // Transitions end
+
+    switch (SMfour)     // State actions begin
+    {
+        case Start4:
+            break;
+
+        case soundOff:
+            speakerVar = 0;
+            break;
+
+        case soundOn:
+            speakerVar = 1;
+            break;
+    }                   // State actions end
+}
+
 void Tick3() 
 {
     switch (SMthree)    // Transitions begin
@@ -141,6 +187,8 @@ void Tick3()
                 blinkLEDCounter = 0;
             }
 
+            //Tick4();
+
             if (threeLEDs == 1)
                 output = 0x01;
             else if (threeLEDs == 2) 
@@ -150,6 +198,11 @@ void Tick3()
 
             output = output | blinkingLED;
 
+            if (speakerVar == 0)
+                output = output & 0x0F;
+            else if (speakerVar == 1)
+                output = output | 0x10;
+
             threeLEDCounter++;
             blinkLEDCounter++;
     }                   // State actions end
@@ -157,16 +210,19 @@ void Tick3()
 
 int main(void) 
 {
+    DDRA = 0x00; PORTA = 0xFF;
     DDRB = 0xFF; PORTB = 0x00;
 
     SMone = Start1;
     SMtwo = Start2;
     SMthree = Start3;
+    SMfour = Start4;
     TimerSet(100);      // 100ms period
     TimerOn();
 
     while (1) 
     {
+        Tick4();
         Tick3();
 
         PORTB = output;
