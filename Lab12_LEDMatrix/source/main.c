@@ -1,13 +1,13 @@
-/*	Author: Luke McFadden
+/*  Author: Luke McFadden
  *  Partner(s) Name: 
- *	Lab Section: 023
- *	Assignment: Lab 12  Exercise 4
- *	Exercise Description: 
+ *  Lab Section: 023
+ *  Assignment: Lab 12  Exercise 4
+ *  Exercise Description: 
  *
- *	I acknowledge all content contained herein, excluding template or example
- *	code, is my own original work.
+ *  I acknowledge all content contained herein, excluding template or example
+ *  code, is my own original work.
  *
- * Demo Link:
+ * Demo Link: https://youtu.be/mXOas1Sw0nY
  */
 #include <avr/io.h>
 #ifdef _SIMULATE_
@@ -20,25 +20,25 @@
 #define A5 (~PINA & 0x20)   // Move left
 #define A4 (~PINA & 0x10)   // Move right
 
-enum MatrixShift {display};
-enum Buttons {standby, up, down, left, right, wait} bState;
+enum MatrixShift {display} state;
+enum Buttons {standby} bState;
 
-static unsigned char patternArr[5] = {0x00, 0x3C, 0x24, 0x3C, 0x00};       
-static unsigned char rowArr[5] = {0xFF, 0xFD, 0xFB, 0xF7, 0xFF};         
-unsigned char pattern = 0x00;        // 0 - off, 1 - on
-unsigned char row = 0xFF;            // 0 - displayed, 1 - not displayed
-unsigned char pos = 0;
-unsigned char horizontal = 2;               // Goes 0 through 4, adjusts pattern
-unsigned char vertical = 1;                 // Goes 0 through 2, adjusts row
+static unsigned int patternArr[3] = {0x3C, 0x24, 0x3C};       
+static unsigned int rowArr[3] = {0x02, 0x04, 0x08}; 
+static unsigned int permRow[3] = {0x02, 0x04, 0x08};      
+unsigned int pattern;               // 0 - off, 1 - on
+unsigned int row;                   // 0 - displayed, 1 - not displayed
+unsigned int pos = 0;
+unsigned int horizontal = 2;        // Goes 0 through 4, adjusts pattern
+unsigned int vertical = 1;          // Goes 0 through 2, adjusts row
 
-int shiftRow(int state)
+int displayFunc (int state)
 {
     switch (state)  // Transitions begin
     {
         case display:
             state = display;
             break;
-
 
         default:
             state = display;
@@ -47,28 +47,44 @@ int shiftRow(int state)
     switch (state)  // State actions begin
     {
         case display:
-            if (pos < 4)
+            if (pos < 2)
                 pos++;          
-            else if (pos == 4)           
+            else if (pos == 2)           
                 pos = 0;
             
-            //pattern = patternArr[pos];
-            row = rowArr[pos];
 
-            if (horizontal == 0)           
-                pattern = patternArr[pos] << 2;           
-            else if (horizontal == 1)          
-                pattern = patternArr[pos] << 1;           
-            else if (horizontal == 2)  // Do nothing           
-                pattern = patternArr[pos];        
-            else if (horizontal == 3)            
-                pattern = patternArr[pos] >> 1;           
-            else if (horizontal == 4)           
-                pattern = patternArr[pos] >> 2;
-            
-            //if (vertical == 0)
+            pattern = patternArr[pos];
 
-              
+            if (vertical == 0 && rowArr[2] < 0x10)
+            {
+                for (int i = 0; i < 3; i++)
+                    rowArr[i] = rowArr[i] << 1;
+            }
+            else if (vertical == 1)             
+            {
+                for (int i = 0; i < 3; i++)
+                    rowArr[i] = permRow[i];
+            }
+            else if (vertical == 2 && rowArr[0] > 0x01)
+            {
+                for (int i = 0; i < 3; i++)
+                    rowArr[i] = rowArr[i] >> 1;
+            }
+
+            row = ~rowArr[pos];
+        
+
+            if (horizontal == 0)
+                pattern = (pattern >> 2);
+            else if (horizontal == 1)
+                pattern = (pattern >> 1);   
+            else if (horizontal == 3)  
+                pattern = (pattern << 1);   
+            else if (horizontal == 4)  
+                pattern = (pattern << 2);    
+            else 
+                pattern = pattern;  
+
             break;
     }               // State actions end
 
@@ -87,78 +103,41 @@ int buttonFunc(int bState)
     switch (bState)
     {
         case standby:
-            // if (A7 && !A6 && !A5 && !A4)
-            //     bState = up;
-            // else if (!A7 && A6 && !A5 && !A4)
-            //     bState = down;
-            // else if (!A7 && !A6 && A5 && !A4)
-            //     bState = left;
-            // else if (!A7 && !A6 && !A5 && A4)
-            //     bState = right;
-            if (A7)
-                bState = up;
-            else if (A6)
-                bState = down;
-            else if (A5)
-                bState = left;
-            else if (A4)
-                bState = right;
-            else
-                bState = standby;
+            bState = standby;
+            break;
 
-            case up:
-                bState = wait;
-                break;
-
-            case down:
-                bState = wait;
-                break;
-                
-            case left:
-                bState = wait;
-                break;
-
-            case right:
-                bState = wait;
-                break;   
-
-            case wait:
-                if (A7 || A6 || A5 || A4)
-                    bState = wait;
-                else if (!A7 && !A6 && !A5 && !A4)
-                    bState = standby;
-                break;
-
-            default:
-                bState = standby;
+        default:
+            bState = standby;
     }
 
     switch (bState)
     {
         case standby:
-            break;
-
-        case up:
-            if (vertical < 2)
-                vertical = vertical + 1;
-            break;
-
-        case down:
-            if (vertical > 0)
-                vertical = vertical - 1;
-            break;
-
-        case left:
-            if (horizontal > 0)
-                horizontal = horizontal - 1;
-            break;
-
-        case right:
-            if (horizontal < 4)
-                horizontal = horizontal + 1;
-            break;
-
-        case wait:
+            if (A7)         // up
+            {
+                if (vertical < 2)
+                    vertical += 1;
+            }
+            else if (A6)    // down  
+            {
+                if (vertical > 0)
+                    vertical -= 1;
+            }
+            else if (A5)    // left
+            {
+                if (horizontal < 4)
+                    horizontal += 1;
+            }
+            else if (A4)    // right
+            {
+                if (horizontal > 0)
+                    horizontal -= 1;
+            }
+            else
+            {
+                horizontal = horizontal;
+                vertical = vertical;
+            }
             break;
     }
 
@@ -167,25 +146,26 @@ int buttonFunc(int bState)
 
 int main(void) 
 {
-    int state = 0;
-    int bState = 0;
+    int timer = 0;
 
     DDRA = 0x00; PORTA = 0xFF;
     DDRC = 0xFF; PORTC = 0x00;
     DDRD = 0xFF; PORTD = 0x00;
 
-    TimerSet(200);
+    TimerSet(1);
     TimerOn();
-
-    state = display;
-    bState = standby;
 
     while (1) 
     {
-        //state = display;
-        //bState = standby;
-        shiftRow(state);
-        buttonFunc(bState);
+        if (timer < 115)
+            timer++;
+        else
+        {
+            timer = 0;
+            buttonFunc(bState);
+        }
+
+        displayFunc(state);
 
         while (!TimerFlag);
         TimerFlag = 0;
