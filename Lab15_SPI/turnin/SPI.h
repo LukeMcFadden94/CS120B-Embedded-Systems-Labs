@@ -1,7 +1,17 @@
-// #ifndef SPI_H
-// #define SPI_H
+#ifndef SPI_H
+#define SPI_H
 
 #include <avr/interrupt.h>
+
+/************************************
+
+    SPI pins:
+    PINB7: SCK      (Serial Clock, output from Master)
+    PINB6: MISO     (Master In, Slave Out)
+    PINB5: MOSI     (Master Out, Slave In)
+    PINB4: SS       (Slave Select)
+
+************************************/
 
 unsigned char receivedData = 0x00;
 
@@ -33,8 +43,7 @@ void SPI_MasterTransmit(char cData)
 }
 
 ISR(SPI_STC_vect)   
-{   // this enable in with the SPCR register's "SPI interrupt Enable"
-    // SPDR contains the received data, e.g. unsigned char receivedData = SPDR;
+{   
     receivedData = SPDR;
 }
 
@@ -75,4 +84,4 @@ ISR(SPI_STC_vect)
 //     return SPDR;
 // }
 
-//#endif //SPI_H
+#endif //SPI_H
