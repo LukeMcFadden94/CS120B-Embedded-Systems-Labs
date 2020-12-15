@@ -90,53 +90,59 @@
 //     return state;
 // }
 
-// enum keypad_States {keypad_keypad};
-// int keypadSMTick(int kp_currState) 
-// {
-//     unsigned char x;
+unsigned char pattern = 0x00;
+unsigned char speed = 0x00;
 
-//     switch (kp_currState) 
-//     {
-//         case keypad_keypad:
-//             x = GetKeypadKey();
-//             switch (x) 
-//             {
-//                 case '\0': keypad_output = 0x1F; break;
-//                 case '1': keypad_output = 0x01; break;
-//                 case '2': keypad_output = 0x02; break;
-//                 case '3': keypad_output = 0x03; break;
-//                 case '4': keypad_output = 0x04; break;
-//                 case '5': keypad_output = 0x05; break;
-//                 case '6': keypad_output = 0x06; break;
-//                 case '7': keypad_output = 0x07; break;
-//                 case '8': keypad_output = 0x08; break;
-//                 case '9': keypad_output = 0x09; break;
-//                 case 'A': keypad_output = 0x0A; break;
-//                 case 'B': keypad_output = 0x0B; break;
-//                 case 'C': keypad_output = 0x0C; break;
-//                 case 'D': keypad_output = 0x0D; break;
-//                 case '*': keypad_output = 0x0E; break;
-//                 case '0': keypad_output = 0x00; break;
-//                 case '#': keypad_output = 0x0F; break;
-//                 default: keypad_output = 0x00; break;
-//             }
+enum keypadDevice {keypad};
+int keypadSM(int state) 
+{
+    unsigned char x;
 
-//             kp_currState = keypad_keypad;
-//             break;
+    switch (state) 
+    {
+        case keypad:
+            x = GetKeypadKey();
+            switch (x) 
+            {
+                case '\0': keypad_output = 0x1F; break;
+                case '1': keypad_output = 0x01; break;
+                case '2': keypad_output = 0x02; break;
+                case '3': keypad_output = 0x03; break;
+                case '4': keypad_output = 0x04; break;
+                case '5': keypad_output = 0x05; break;
+                case '6': keypad_output = 0x06; break;
+                case '7': keypad_output = 0x07; break;
+                case '8': keypad_output = 0x08; break;
+                case '9': keypad_output = 0x09; break;
+                case 'A': keypad_output = 0x0A; break;
+                case 'B': keypad_output = 0x0B; break;
+                case 'C': keypad_output = 0x0C; break;
+                case 'D': keypad_output = 0x0D; break;
+                case '*': keypad_output = 0x0E; break;
+                case '0': keypad_output = 0x00; break;
+                case '#': keypad_output = 0x0F; break;
+                default: keypad_output = 0x00; break;
+            }
 
-//         default:
-//             kp_currState = keypad_keypad;
-//             break;
-//     }
+            state = keypad;
+            break;
 
-//     switch (kp_currState) 
-//     {
-//         default: 
-//             break;
-//     }
+        default:
+            state = keypad;
+            break;
+    }
+
+    switch (state) 
+    {
+        case keypad:
+            break;
+
+        default: 
+            break;
+    }
     
-//     return kp_currState;
-// }
+    return state;
+}
 
 // enum display {displayState} displaySM;
 // int displaySMTick (int state)
@@ -286,6 +292,11 @@ int main(void)
     task2.period = 32;
     task2.elapsedTime = task2.period;
     task2.TickFct = &TransmitSM;
+
+    task3.state = keypad;
+    task3.period = 32;
+    task3.elapsedTime = task2.period;
+    task3.TickFct = &keypadSM;
 
     unsigned long GCD = tasks[0]->period;
     for (unsigned short k = 1; k < numTasks; k++)

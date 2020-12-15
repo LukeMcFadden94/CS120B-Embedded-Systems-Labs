@@ -215,8 +215,8 @@
 //static unsigned char var = 0x00;
 unsigned char var = 0x00;
 
-enum IncrementVal {cycle};
-int IncrementSM(int state)
+enum IncrementAndTransmit {cycle};
+int IncrementTransmitSM(int state)
 {
     switch (state)
     {                   // Transitions begin
@@ -236,34 +236,36 @@ int IncrementSM(int state)
                 var = 0x00;
             else 
                 var = var + 1;
-            break;
-    }                   // State actions end
 
-    return state;
-}
-
-enum TransmitNumbers {send};
-int TransmitSM(int state)
-{
-    switch (state)
-    {                   // Transitions begin
-        case send:
-            state = send;
-
-        default:
-            state = send;
-            break;
-    }                   // Transitions end
-
-    switch (state)
-    {                   // State actions begin
-        case send:
             SPI_MasterTransmit(var);
             break;
     }                   // State actions end
 
     return state;
 }
+
+// enum TransmitNumbers {send};
+// int TransmitSM(int state)
+// {
+//     switch (state)
+//     {                   // Transitions begin
+//         case send:
+//             state = send;
+
+//         default:
+//             state = send;
+//             break;
+//     }                   // Transitions end
+
+//     switch (state)
+//     {                   // State actions begin
+//         case send:
+//             SPI_MasterTransmit(var);
+//             break;
+//     }                   // State actions end
+
+//     return state;
+// }
 
 int main(void) 
 {
@@ -273,19 +275,19 @@ int main(void)
     //DDRC = 0xFF; PORTC = 0x00;  // Columns of LED Matrix
     //DDRD = 0xF0; PORTD = 0x0F;  // Keypad
 
-    static task task1, task2;
-    task *tasks[] = {&task1, &task2};
+    static task task1;
+    task *tasks[] = {&task1};
     const unsigned short numTasks = sizeof(tasks)/sizeof(task*);
 
     task1.state = cycle;
     task1.period = 32;
     task1.elapsedTime = task1.period;
-    task1.TickFct = &IncrementSM;
+    task1.TickFct = &IncrementTransmitSM;
 
-    task2.state = send;
-    task2.period = 32;
-    task2.elapsedTime = task2.period;
-    task2.TickFct = &TransmitSM;
+    // task2.state = send;
+    // task2.period = 1;
+    // task2.elapsedTime = task2.period;
+    // task2.TickFct = &TransmitSM;
 
     unsigned long GCD = tasks[0]->period;
     for (unsigned short k = 1; k < numTasks; k++)
