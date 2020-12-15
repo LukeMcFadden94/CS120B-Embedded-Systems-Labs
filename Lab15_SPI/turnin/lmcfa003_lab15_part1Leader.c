@@ -7,7 +7,7 @@
  *  I acknowledge all content contained herein, excluding template or example
  *  code, is my own original work.
  *
- * Demo Link: https://youtu.be/KtNVkzukERw
+ * Demo Link: https://youtu.be/BJUwlRBpaxA
  */
 
 /*******************************
@@ -215,12 +215,16 @@
 //static unsigned char var = 0x00;
 unsigned char var = 0x00;
 
-enum IncrementAndTransmit {cycle};
+enum IncrementAndTransmit {cycle, transmit};
 int IncrementTransmitSM(int state)
 {
     switch (state)
     {                   // Transitions begin
         case cycle:
+            state = transmit;
+            break;
+
+        case transmit:
             state = cycle;
             break;
 
@@ -236,36 +240,15 @@ int IncrementTransmitSM(int state)
                 var = 0x00;
             else 
                 var = var + 1;
+            break;
 
+        case transmit:
             SPI_MasterTransmit(var);
             break;
     }                   // State actions end
 
     return state;
 }
-
-// enum TransmitNumbers {send};
-// int TransmitSM(int state)
-// {
-//     switch (state)
-//     {                   // Transitions begin
-//         case send:
-//             state = send;
-
-//         default:
-//             state = send;
-//             break;
-//     }                   // Transitions end
-
-//     switch (state)
-//     {                   // State actions begin
-//         case send:
-//             SPI_MasterTransmit(var);
-//             break;
-//     }                   // State actions end
-
-//     return state;
-// }
 
 int main(void) 
 {
@@ -280,14 +263,9 @@ int main(void)
     const unsigned short numTasks = sizeof(tasks)/sizeof(task*);
 
     task1.state = cycle;
-    task1.period = 32;
+    task1.period = 1000;
     task1.elapsedTime = task1.period;
     task1.TickFct = &IncrementTransmitSM;
-
-    // task2.state = send;
-    // task2.period = 1;
-    // task2.elapsedTime = task2.period;
-    // task2.TickFct = &TransmitSM;
 
     unsigned long GCD = tasks[0]->period;
     for (unsigned short k = 1; k < numTasks; k++)
@@ -300,14 +278,15 @@ int main(void)
 
     SPI_MasterInit();
 
+    unsigned short i;
     while (1) 
     {
-        for (int i = 0; i < numTasks; i++ ) {
+        for (i = 0; i < numTasks; i++ ) {
             if ( tasks[i]->elapsedTime == tasks[i]->period ) {
                 tasks[i]->state = tasks[i]->TickFct(tasks[i]->state);
                 tasks[i]->elapsedTime = 0;
             }
-            tasks[i]->elapsedTime += 1;
+            tasks[i]->elapsedTime += GCD;
         }
 
         while (!TimerFlag);

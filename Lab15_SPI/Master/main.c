@@ -90,60 +90,6 @@
 //     return state;
 // }
 
-unsigned char pattern = 0x00;
-unsigned char speed = 0x00;
-
-enum keypadDevice {keypad};
-int keypadSM(int state) 
-{
-    unsigned char x;
-
-    switch (state) 
-    {
-        case keypad:
-            x = GetKeypadKey();
-            switch (x) 
-            {
-                case '\0': keypad_output = 0x1F; break;
-                case '1': keypad_output = 0x01; break;
-                case '2': keypad_output = 0x02; break;
-                case '3': keypad_output = 0x03; break;
-                case '4': keypad_output = 0x04; break;
-                case '5': keypad_output = 0x05; break;
-                case '6': keypad_output = 0x06; break;
-                case '7': keypad_output = 0x07; break;
-                case '8': keypad_output = 0x08; break;
-                case '9': keypad_output = 0x09; break;
-                case 'A': keypad_output = 0x0A; break;
-                case 'B': keypad_output = 0x0B; break;
-                case 'C': keypad_output = 0x0C; break;
-                case 'D': keypad_output = 0x0D; break;
-                case '*': keypad_output = 0x0E; break;
-                case '0': keypad_output = 0x00; break;
-                case '#': keypad_output = 0x0F; break;
-                default: keypad_output = 0x00; break;
-            }
-
-            state = keypad;
-            break;
-
-        default:
-            state = keypad;
-            break;
-    }
-
-    switch (state) 
-    {
-        case keypad:
-            break;
-
-        default: 
-            break;
-    }
-    
-    return state;
-}
-
 // enum display {displayState} displaySM;
 // int displaySMTick (int state)
 // {
@@ -203,6 +149,60 @@ int keypadSM(int state)
 //     return state;
 // }
 
+unsigned char pattern = 0x00;
+unsigned char speed = 0x00;
+
+enum keypadDevice {keypad};
+int keypadSM(int state) 
+{
+    unsigned char x;
+
+    switch (state) 
+    {
+        case keypad:
+            x = GetKeypadKey();
+            switch (x) 
+            {
+                case '\0': keypad_output = 0x1F; break;
+                case '1': keypad_output = 0x01; break;
+                case '2': keypad_output = 0x02; break;
+                case '3': keypad_output = 0x03; break;
+                case '4': keypad_output = 0x04; break;
+                case '5': keypad_output = 0x05; break;
+                case '6': keypad_output = 0x06; break;
+                case '7': keypad_output = 0x07; break;
+                case '8': keypad_output = 0x08; break;
+                case '9': keypad_output = 0x09; break;
+                case 'A': keypad_output = 0x0A; break;
+                case 'B': keypad_output = 0x0B; break;
+                case 'C': keypad_output = 0x0C; break;
+                case 'D': keypad_output = 0x0D; break;
+                case '*': keypad_output = 0x0E; break;
+                case '0': keypad_output = 0x00; break;
+                case '#': keypad_output = 0x0F; break;
+                default: keypad_output = 0x00; break;
+            }
+
+            state = keypad;
+            break;
+
+        default:
+            state = keypad;
+            break;
+    }
+
+    switch (state) 
+    {
+        case keypad:
+            break;
+
+        default: 
+            break;
+    }
+    
+    return state;
+}
+
 /**********************
 
     SPI pins:
@@ -221,12 +221,16 @@ int keypadSM(int state)
 //static unsigned char var = 0x00;
 unsigned char var = 0x00;
 
-enum IncrementVal {cycle};
-int IncrementSM(int state)
+enum IncrementAndTransmit {cycle, transmit};
+int IncrementTransmitSM(int state)
 {
     switch (state)
     {                   // Transitions begin
         case cycle:
+            state = transmit;
+            break;
+
+        case transmit:
             state = cycle;
             break;
 
@@ -243,33 +247,37 @@ int IncrementSM(int state)
             else 
                 var = var + 1;
             break;
-    }                   // State actions end
 
-    return state;
-}
-
-enum TransmitNumbers {send};
-int TransmitSM(int state)
-{
-    switch (state)
-    {                   // Transitions begin
-        case send:
-            state = send;
-
-        default:
-            state = send;
-            break;
-    }                   // Transitions end
-
-    switch (state)
-    {                   // State actions begin
-        case send:
+        case transmit:
             SPI_MasterTransmit(var);
             break;
     }                   // State actions end
 
     return state;
 }
+
+// enum TransmitNumbers {send};
+// int TransmitSM(int state)
+// {
+//     switch (state)
+//     {                   // Transitions begin
+//         case send:
+//             state = send;
+
+//         default:
+//             state = send;
+//             break;
+//     }                   // Transitions end
+
+//     switch (state)
+//     {                   // State actions begin
+//         case send:
+//             SPI_MasterTransmit(var);
+//             break;
+//     }                   // State actions end
+
+//     return state;
+// }
 
 int main(void) 
 {
@@ -279,24 +287,14 @@ int main(void)
     //DDRC = 0xFF; PORTC = 0x00;  // Columns of LED Matrix
     //DDRD = 0xF0; PORTD = 0x0F;  // Keypad
 
-    static task task1, task2;
-    task *tasks[] = {&task1, &task2};
+    static task task1;
+    task *tasks[] = {&task1};
     const unsigned short numTasks = sizeof(tasks)/sizeof(task*);
 
     task1.state = cycle;
-    task1.period = 32;
+    task1.period = 1000;
     task1.elapsedTime = task1.period;
-    task1.TickFct = &IncrementSM;
-
-    task2.state = send;
-    task2.period = 32;
-    task2.elapsedTime = task2.period;
-    task2.TickFct = &TransmitSM;
-
-    task3.state = keypad;
-    task3.period = 32;
-    task3.elapsedTime = task2.period;
-    task3.TickFct = &keypadSM;
+    task1.TickFct = &IncrementTransmitSM;
 
     unsigned long GCD = tasks[0]->period;
     for (unsigned short k = 1; k < numTasks; k++)
@@ -309,14 +307,15 @@ int main(void)
 
     SPI_MasterInit();
 
+    unsigned short i;
     while (1) 
     {
-        for (int i = 0; i < numTasks; i++ ) {
+        for (i = 0; i < numTasks; i++ ) {
             if ( tasks[i]->elapsedTime == tasks[i]->period ) {
                 tasks[i]->state = tasks[i]->TickFct(tasks[i]->state);
                 tasks[i]->elapsedTime = 0;
             }
-            tasks[i]->elapsedTime += 1;
+            tasks[i]->elapsedTime += GCD;
         }
 
         while (!TimerFlag);

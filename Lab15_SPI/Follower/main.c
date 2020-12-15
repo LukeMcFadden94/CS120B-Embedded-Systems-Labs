@@ -92,7 +92,7 @@ int main(void)
     const unsigned short numTasks = sizeof(tasks)/sizeof(task*);
 
     task1.state = display;
-    task1.period = 32;
+    task1.period = 1000;
     task1.elapsedTime = task1.period;
     task1.TickFct = &displaySM;
 
@@ -114,7 +114,7 @@ int main(void)
                 tasks[i]->state = tasks[i]->TickFct(tasks[i]->state);
                 tasks[i]->elapsedTime = 0;
             }
-            tasks[i]->elapsedTime += 1;
+            tasks[i]->elapsedTime += GCD;
         }
 
         while (!TimerFlag);

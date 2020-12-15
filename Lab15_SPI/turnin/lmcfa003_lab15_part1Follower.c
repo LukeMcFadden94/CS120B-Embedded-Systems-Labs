@@ -1,13 +1,13 @@
-/*	Author: Luke McFadden
+/*  Author: Luke McFadden
  *  Partner(s) Name: 
- *	Lab Section:
- *	Assignment: Lab 15  Exercise 1
- *	Exercise Description: 
+ *  Lab Section:
+ *  Assignment: Lab 15  Exercise 1
+ *  Exercise Description: 
  *
- *	I acknowledge all content contained herein, excluding template or example
- *	code, is my own original work.
+ *  I acknowledge all content contained herein, excluding template or example
+ *  code, is my own original work.
  *
- * Demo Link: https://youtu.be/KtNVkzukERw
+ * Demo Link: https://youtu.be/BJUwlRBpaxA
  */
 
 /*******************************
@@ -92,7 +92,7 @@ int main(void)
     const unsigned short numTasks = sizeof(tasks)/sizeof(task*);
 
     task1.state = display;
-    task1.period = 32;
+    task1.period = 1000;
     task1.elapsedTime = task1.period;
     task1.TickFct = &displaySM;
 
@@ -114,7 +114,7 @@ int main(void)
                 tasks[i]->state = tasks[i]->TickFct(tasks[i]->state);
                 tasks[i]->elapsedTime = 0;
             }
-            tasks[i]->elapsedTime += 1;
+            tasks[i]->elapsedTime += GCD;
         }
 
         while (!TimerFlag);
