@@ -1,7 +1,9 @@
 # CS120B-Embedded-Systems-Labs
-Luke McFadden's Repo for CS120B Lab, UCR Fall 2020.
+Luke McFadden's Repo for Embedded Systems course from UCR Fall 2020.
 
 This repo is forked directly from my university github account.
+
+Any usage/forking/cloning/etc of any portion of this repo for the purpose of submitting as coursework is prohibited.
 
 Various componenets are utilized throughout the labs:
 - ATMEGA1284-PU
