@@ -1,4 +1,4 @@
-# CS120B-Embedded-Systems-Labs
+# Embedded-Systems-Labs
 Luke McFadden's Repo for Embedded Systems course from UCR Fall 2020.
 
 This repo is forked directly from my university github account.
