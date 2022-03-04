@@ -14,3 +14,8 @@ Various componenets are utilized throughout the labs:
 - Speakers/buzzers
 - LEDs
 - Buttons
+
+Video demonstrations of some of the labs are as follows:
+- https://www.youtube.com/watch?v=5LHiP0uQ64o
+- https://www.youtube.com/watch?v=8yPD0Ia2j04
+- https://www.youtube.com/watch?v=bsKRJL9CfAo
